@@ -1,0 +1,22 @@
+# this is our development docker-compose building on top of the production docker-compose, just mounting
+# the sync image - not redefining anything else
+
+version: "2"
+services:
+  php:
+    volumes:
+      - appcode-native-osx-sync:/var/www/html/web:nocopy
+      - mediacode-native-osx-sync:/var/www/html/web/media:nocopy
+  nginx:
+    volumes:
+      - nginx-native-osx-sync:/etc/machineagent-bundle-64bit-linux-4.3.0.0:nocopy
+      #- nginx-log-native-osx-sync:/var/log/nginx:nocopy
+volumes:
+  appcode-native-osx-sync:
+    external: true
+  mediacode-native-osx-sync:
+    external: true
+  nginx-native-osx-sync:
+    external: true
+  #nginx-log-native-osx-sync:
+    #external: true

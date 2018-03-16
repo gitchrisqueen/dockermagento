@@ -1,0 +1,15 @@
+version: "2"
+
+options:
+  verbose: true
+syncs:
+  appcode-native-osx-sync: # tip: add -sync and you keep consistent names as a convention
+    src: './web'
+    # sync_strategy: 'native_osx' # not needed, this is the default now
+    sync_excludes: ['.phpstorm.meta.php', '2017-11-30_140633_chrisque_fb_magento.sql']
+  mediacode-native-osx-sync: # tip: add -sync and you keep consistent names as a convention
+    src: './media'
+  nginx-native-osx-sync:
+    src: './machineagent-bundle-64bit-linux-4.3.0.0'
+  #nginx-log-native-osx-sync:
+    #src: './logs/nginx'

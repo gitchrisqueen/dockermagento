@@ -1,0 +1,18 @@
+commands:
+  N98\Magento\Command\Installer\InstallCommand:
+    installation:
+
+        defaults:
+          currency: USD
+          locale: en_US
+          timezone: America/New_York
+          use_secure: no
+          use_rewrites: yes
+          session_save: db
+          admin_username: ${ADMIN_USERNAME}
+          admin_firstname: ${ADMIN_FIRSTNAME}
+          admin_lastname: ${ADMIN_LASTNAME}
+          admin_password: ${ADMIN_PASSWORD}
+          admin_frontname: ${ADMIN_FRONTNAME}
+          admin_email: ${ADMIN_EMAIL}
+          encryption_key: ${ENCRYPTIONKEY}

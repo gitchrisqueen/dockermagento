@@ -1,0 +1,137 @@
+version: '2.0'
+services:
+  installer:
+    image: chrisqueen/dockerizedmagento-installer
+    environment:
+      DOMAIN: dockerized-magento.local
+      MAGENTO_ROOT: /var/www/html/web
+      MYSQL_HOST: mysql
+      MYSQL_DATABASE: magento
+      MYSQL_USER: root
+      MYSQL_PASSWORD: pw
+      ADMIN_USERNAME: admin
+      ADMIN_FIRSTNAME: Admin
+      ADMIN_LASTNAME: Istrator
+      ADMIN_PASSWORD: pass1234
+      ADMIN_FRONTNAME: admin
+      ADMIN_EMAIL: admin@demo.com
+      ENCRYPTIONKEY: 731aea833710535779fe8c7c49bc6c4d
+    volumes_from:
+      - nginx
+    volumes:
+      - ./config/installer/php/php.ini:/usr/local/etc/php/php.ini
+      - ./config/installer/magerun/n98-magerun.yaml.tmpl:/etc/n98-magerun.yaml.tmpl
+      - ./config/installer/magento/local.xml.tmpl:/etc/local.xml.tmpl
+      - ./config/installer/magento/fpc.xml.tmpl:/etc/fpc.xml.tmpl
+      - ./config/installer/bin/substitute-env-vars.sh:/bin/substitute-env-vars.sh
+      - ./config/installer/bin/install.sh:/bin/install.sh
+    links:
+      - "cache:rediscache"
+      - "sessions:redissession"
+      - "fullpagecache:redisfullpagecache"
+      - "solr:solr"
+      - "mysql:mysql"
+      #- "selenium:selenium"
+    #extra_hosts:
+      #- "mysql:77.104.144.190"
+    depends_on:
+      - "php"
+    entrypoint: /bin/install.sh
+  nginx:
+    image: nginx:latest
+    #domainname: dockerized-magento.local
+    #hostname: dockerized-magento
+    ports:
+      - "80:80"
+      - "443:443"
+    links:
+      - "php"
+    depends_on:
+      - "php"
+    volumes:
+      - ./config/ssl/cert.pem:/etc/nginx/ssl/cert.pem
+      - ./config/ssl/cert.key:/etc/nginx/ssl/cert.key
+      - ./config/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./config/nginx/sites-enabled/default.conf:/etc/nginx/conf.d/default.conf
+      - ./config/nginx/includes:/etc/nginx/includes
+      - ./config/nginx/custom-locations:/etc/nginx/custom-locations
+    volumes_from:
+      - php
+
+  cron:
+      image: meanbee/magento:5.6-cli
+      hostname: cron.dockerized-magento.local
+      working_dir: /var/www/html/web
+      command: /run-cron.sh
+      volumes_from:
+        - php
+      environment:
+        - ENABLE_SENDMAIL=true
+      depends_on:
+        - php
+      links:
+        - php
+        - "cache:rediscache"
+        - "sessions:redissession"
+        - "fullpagecache:redisfullpagecache"
+        - "solr:solr"
+		- "mysql:mysql"
+      #extra_hosts:
+        #- "mysql:11.101.101.111"
+  php:
+    #build: ./docker-images/php
+    image: chrisqueen/dockerized-magento-php
+    links:
+      - "cache:rediscache"
+      - "sessions:redissession"
+      - "fullpagecache:redisfullpagecache"
+      - "solr:solr"
+      - "mysql:mysql"
+    #extra_hosts:
+      #- "mysql:11.101.101.111"
+    #depends_on:
+      #- "mysql"
+    volumes:
+      - ./web:/var/www/html/web
+      - ./media:/var/www/html/web/media
+  mysql:
+   image: mysql:5.6
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: pw
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+      - ./config/mysql:/etc/mysql/conf.d
+      - ./data/sql_dumps/:/sql_dumps
+  solr:
+    image: chrisqueen/dockerizedmagento-solr
+  cache:
+    image: redis:latest
+  fullpagecache:
+    image: redis:latest
+  sessions:
+    image: redis:latest
+  adminphp:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8080:80"
+    links:
+      - "mysql:mysql"
+    depends_on:
+      - "mysql"
+    environment:
+      PMA_HOST: "mysql"
+      PMA_PORT: 3306
+  #selenium:
+    #image: selenium/standalone-firefox-debug
+    #image: selenium/standalone-chrome-debug
+    #image: selenium/standalone-chrome-debug
+    #environment:
+      #JAVA_OPTS: "-Xmx2048m -Djava.awt.headless=true"
+      #SE_OPTS: "-browserSessionReuse"
+    #ports:
+      #- "4444:4444"
+      #- "5900:5900"
+    #links:
+      #- "nginx:dockerized-magento.local"
