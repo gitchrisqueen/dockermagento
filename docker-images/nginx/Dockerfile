@@ -2,6 +2,10 @@ FROM nginx:latest
 
 RUN rm -rf /etc/nginx/conf.d/*
 
+ENV SSL_CERTIFICATE_PATH /etc/nginx/ssl
+ENV SSL_CERTIFICATE_KEY_PATH /etc/nginx/ssl/cert.key
+
+
 COPY bin/ /usr/sbin/
 COPY sites-templates /etc/nginx/sites-templates
 COPY nginx.conf /etc/nginx/nginx.conf
