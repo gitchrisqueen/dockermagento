@@ -1,5 +1,13 @@
 FROM php:5.6
 
+COPY php/php.ini /usr/local/etc/php/php.ini
+COPY magerun/n98-magerun.yaml.tmpl /etc/n98-magerun.yaml.tmpl
+COPY magento/local.xml.tmpl /etc/local.xml.tmpl
+COPY magento/fpc.xml.tmpl /etc/fpc.xml.tmpl
+COPY bin/substitute-env-vars.sh /bin/substitute-env-vars.sh
+COPY bin/install.sh /bin/install.sh
+
+
 # Configure PHP
 RUN buildDeps=" \
         libpng12-dev \

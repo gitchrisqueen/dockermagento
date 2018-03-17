@@ -144,6 +144,15 @@ stop() {
     docker-sync-stack clean
 }
 
+
+startcloud() {
+    hyper compose up -f hyper-compose.yml
+}
+
+stopcloud() {
+    hyper compose down
+}
+
 restart() {
     #$DOCKERCOMPOSE restart
     stop
@@ -190,8 +199,16 @@ case "$action" in
     start
     ;;
 
+    startcloud)
+    startcloud
+    ;;
+
     stop)
     stop
+    ;;
+
+    stopcloud)
+    stopcloud
     ;;
 
     restart)

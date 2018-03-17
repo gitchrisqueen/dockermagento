@@ -1,0 +1,126 @@
+version: '2'
+services:
+  installer:
+    image: chrisqueen/dockermagento-installer
+    size: s4
+    environment:
+      DOMAIN: 209.177.92.66
+      MAGENTO_ROOT: /var/www/html/web
+      MYSQL_HOST: mysql
+      MYSQL_DATABASE: magento
+      MYSQL_USER: root
+      MYSQL_PASSWORD: pw
+      ADMIN_USERNAME: admin
+      ADMIN_FIRSTNAME: Admin
+      ADMIN_LASTNAME: Istrator
+      ADMIN_PASSWORD: pass1234
+      ADMIN_FRONTNAME: admin
+      ADMIN_EMAIL: admin@demo.com
+      ENCRYPTIONKEY: 731aea833710535779fe8c7c49bc6c4d
+    noauto_volume: true
+    volumes:
+      - appcode:/var/www/html/web
+    links:
+      - "cache:rediscache"
+      - "sessions:redissession"
+      - "fullpagecache:redisfullpagecache"
+      - "solr:solr"
+      - "mysql:mysql"
+    depends_on:
+      - "php"
+    entrypoint: /bin/install.sh
+  nginx:
+    image: chrisqueen/dockermagento-nginx
+    #fip: 209.177.92.66
+    fip: auto
+    size: s4
+    hostname: dockermagento-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    links:
+      - "php"
+    depends_on:
+      - "php"
+    noauto_volume: true
+    volumes:
+      - appcode:/var/www/html/web
+  cron:
+    size: s4
+    image: meanbee/magento:5.6-cli
+    hostname: cron.dockerized-magento.local
+    working_dir: /var/www/html/web
+    command: /run-cron.sh
+    noauto_volume: true
+    volumes:
+      - appcode:/var/www/html/web
+    environment:
+      - ENABLE_SENDMAIL=true
+    depends_on:
+      - php
+    links:
+      - "php"
+      - "cache:rediscache"
+      - "sessions:redissession"
+      - "fullpagecache:redisfullpagecache"
+      - "solr:solr"
+      - "mysql:mysql"
+  php:
+    image: chrisqueen/dockermagento-php
+    size: s4
+    links:
+      - "cache:rediscache"
+      - "sessions:redissession"
+      - "fullpagecache:redisfullpagecache"
+      - "solr:solr"
+      - "mysql:mysql"
+    noauto_volume: true
+    volumes:
+      - appcode:/var/www/html/web
+  mysql:
+   image: mysql:5.6
+   size: s4
+   ports:
+     - "3306:3306"
+   environment:
+     MYSQL_ROOT_PASSWORD: pw
+  solr:
+    image: solr
+    size: s4
+    noauto_volume: true
+    ports:
+      - "8983:8983"
+    entrypoint:
+      - docker-entrypoint.sh
+      - solr-precreate
+      - mycore
+  cache:
+    image: redis:latest
+    size: s4
+    noauto_volume: true
+  fullpagecache:
+    image: redis:latest
+    size: s4
+    noauto_volume: true
+  sessions:
+    image: redis:latest
+    size: s4
+    noauto_volume: true
+  adminphp:
+    image: phpmyadmin/phpmyadmin
+    size: s1
+    noauto_volume: true
+    ports:
+      - "8080:80"
+    links:
+      - "mysql:mysql"
+    depends_on:
+      - "mysql"
+    environment:
+      PMA_HOST: "mysql"
+      PMA_PORT: 3306
+volumes:
+  appcode:
+    volumes:
+      - https://github.com/bragento/magento-core
+    external: false

@@ -1,7 +1,7 @@
 version: '2.0'
 services:
   installer:
-    image: chrisqueen/dockerdmagento-installer
+    image: chrisqueen/dockermagento-installer
     environment:
       DOMAIN: dockerized-magento.local
       MAGENTO_ROOT: /var/www/html/web
@@ -59,25 +59,25 @@ services:
       - php
 
   cron:
-      image: meanbee/magento:5.6-cli
-      hostname: cron.dockerized-magento.local
-      working_dir: /var/www/html/web
-      command: /run-cron.sh
-      volumes_from:
-        - php
-      environment:
-        - ENABLE_SENDMAIL=true
-      depends_on:
-        - php
-      links:
-        - php
-        - "cache:rediscache"
-        - "sessions:redissession"
-        - "fullpagecache:redisfullpagecache"
-        - "solr:solr"
-		- "mysql:mysql"
-      #extra_hosts:
-        #- "mysql:11.101.101.111"
+    image: meanbee/magento:5.6-cli
+    hostname: cron.dockerized-magento.local
+    working_dir: /var/www/html/web
+    command: /run-cron.sh
+    volumes_from:
+      - php
+    environment:
+      - ENABLE_SENDMAIL=true
+    depends_on:
+      - php
+    links:
+      - php
+      - "cache:rediscache"
+      - "sessions:redissession"
+      - "fullpagecache:redisfullpagecache"
+      - "solr:solr"
+	  - "mysql:mysql"
+    #extra_hosts:
+       #- "mysql:11.101.101.111"
   php:
     #build: ./docker-images/php
     image: chrisqueen/dockermagento-php
@@ -96,14 +96,14 @@ services:
       - ./media:/var/www/html/web/media
   mysql:
    image: mysql:5.6
-    ports:
-      - "3306:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: pw
-    volumes:
-      - ./data/mysql:/var/lib/mysql
-      - ./config/mysql:/etc/mysql/conf.d
-      - ./data/sql_dumps/:/sql_dumps
+   ports:
+     - "3306:3306"
+   environment:
+     MYSQL_ROOT_PASSWORD: pw
+   volumes:
+     - ./data/mysql:/var/lib/mysql
+     - ./config/mysql:/etc/mysql/conf.d
+     - ./data/sql_dumps/:/sql_dumps
   solr:
     image: chrisqueen/dockermagento-solr
   cache:
