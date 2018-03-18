@@ -2,7 +2,7 @@ FROM nginx:latest
 
 RUN rm -rf /etc/nginx/conf.d/*
 
-ENV SSL_CERTIFICATE_PATH /etc/nginx/ssl
+ENV SSL_CERTIFICATE_PATH /etc/nginx/ssl/cert.pem
 ENV SSL_CERTIFICATE_KEY_PATH /etc/nginx/ssl/cert.key
 
 

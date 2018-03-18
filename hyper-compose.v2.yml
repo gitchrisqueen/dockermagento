@@ -9,4 +9,4 @@ services:
     ports:
       - "80:80"
       - "443:443"
-    noauto_volume: true
+    command: "nginx -g 'daemon off;'"

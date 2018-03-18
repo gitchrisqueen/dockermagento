@@ -20,6 +20,7 @@ services:
     noauto_volume: true
     volumes:
       - appcode:/var/www/html/web
+      #- appcodeinternal:/var/www/html/web
     links:
       - "cache:rediscache"
       - "sessions:redissession"
@@ -43,8 +44,8 @@ services:
     depends_on:
       - "php"
     noauto_volume: true
-    volumes:
-      - appcode:/var/www/html/web
+    #volumes:
+      #- appcodeinternal:/var/www/html/web
   cron:
     size: s4
     image: meanbee/magento:5.6-cli
@@ -52,8 +53,8 @@ services:
     working_dir: /var/www/html/web
     command: /run-cron.sh
     noauto_volume: true
-    volumes:
-      - appcode:/var/www/html/web
+    #volumes:
+      #- appcodeinternal:/var/www/html/web
     environment:
       - ENABLE_SENDMAIL=true
     depends_on:
@@ -76,7 +77,7 @@ services:
       - "mysql:mysql"
     noauto_volume: true
     volumes:
-      - appcode:/var/www/html/web
+      - appcodeinternal:/var/www/html/web
   mysql:
    image: mysql:5.6
    size: s4
@@ -123,4 +124,6 @@ volumes:
   appcode:
     volumes:
       - https://github.com/bragento/magento-core
-    external: false
+  appcodeinternal:
+    volumes:
+          - https://github.com/bragento/magento-core
