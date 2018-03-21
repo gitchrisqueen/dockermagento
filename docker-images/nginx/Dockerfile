@@ -1,4 +1,4 @@
-FROM nginx:latest
+FROM nginx:stable
 
 RUN rm -rf /etc/nginx/conf.d/*
 
@@ -21,4 +21,4 @@ WORKDIR /etc/nginx
 EXPOSE 80 443
 
 ENTRYPOINT ["entrypoint.sh"]
-CMD ["nginx"]
+CMD ["nginx", "-g", "daemon off;"]
