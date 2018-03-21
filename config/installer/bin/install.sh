@@ -146,6 +146,9 @@ fi
 if [ -e "$MAGENTO_ROOT/index.php" ]
 then
 	echo "Magento is already installed."
+
+	echo "Preparing the Magerun Configuration"
+    substitute-env-vars.sh /etc /etc/n98-magerun.yaml.tmpl
 	
 	echo "Installing Sample Data: Database"
     magerun --skip-root-check --root-dir="$MAGENTO_ROOT" db:create
