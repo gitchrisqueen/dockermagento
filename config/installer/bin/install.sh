@@ -146,6 +146,10 @@ fi
 if [ -e "$MAGENTO_ROOT/index.php" ]
 then
 	echo "Magento is already installed."
+	
+	echo "Installing Sample Data: Database"
+    magerun --skip-root-check --root-dir="$MAGENTO_ROOT" db:create
+
 	echo "Updating Magento"
 	updateMagento
 
@@ -197,7 +201,6 @@ chgrp -R 33 $MAGENTO_ROOT/app/etc
 
 echo "Installing Sample Data: Database"
 magerun --skip-root-check --root-dir="$MAGENTO_ROOT" db:create
-#curl -L ftp://firstx.org/magento-1.14.3.2-2017-02-06-07-12-50.tar.gz --user ChrisQ:happ5muhvcL6p7yj014a | tar xz -C $MAGENTO_ROOT
 
 #databaseFilePath="$MAGENTO_ROOT/*.sql"
 #magerun --skip-root-check --root-dir="$MAGENTO_ROOT" db:import $databaseFilePath
