@@ -1,0 +1,135 @@
+installer:
+  image: chrisqueen/dockermagento-installer
+  environment:
+    DOMAIN: fbdev.chrisqueen.com
+    MAGENTO_ROOT: /var/www/html/web
+    MYSQL_HOST: mysql
+    MYSQL_DATABASE: magento
+    MYSQL_USER: root
+    MYSQL_PASSWORD: pw
+    ADMIN_USERNAME: admin
+    ADMIN_FIRSTNAME: Admin
+    ADMIN_LASTNAME: Istrator
+    ADMIN_PASSWORD: pass1234
+    ADMIN_FRONTNAME: admin
+    ADMIN_EMAIL: admin@demo.com
+    ENCRYPTIONKEY: 731aea833710535779fe8c7c49bc6c4d
+  volumes_from:
+    - nginx
+  links:
+    - "cache:rediscache"
+    - "sessions:redissession"
+    - "fullpagecache:redisfullpagecache"
+    - "solr:solr"
+    - "mysql:mysql"
+  entrypoint: /bin/install.sh
+  restart: on-failure
+  tags:
+    - CQC_FB_Dev
+  sequential_deployment: true
+nginx:
+  image: chrisqueen/dockermagento-nginx
+  command: "nginx -g 'daemon off;'"
+  environment:
+    MAGENTO_ROOT: /var/www/html/web
+    MAGENTO_DEVELOPERMODE: 1
+  ports:
+    - "80:80"
+    - "443:443"
+  links:
+    - "php"
+  volumes_from:
+    - php
+  sequential_deployment: true
+  restart: on-failure
+  tags:
+    - CQC_FB_Dev
+cron:
+  image: meanbee/magento:5.6-cli
+  hostname: cron.dockerized-magento.local
+  working_dir: /var/www/html/web
+  command: /run-cron.sh
+  volumes_from:
+    - php
+  environment:
+    - ENABLE_SENDMAIL=true
+  links:
+    - php
+    - "cache:rediscache"
+    - "sessions:redissession"
+    - "fullpagecache:redisfullpagecache"
+    - "solr:solr"
+    - "mysql:mysql"
+  sequential_deployment: true
+  restart: on-failure
+  tags:
+    - CQC_FB_Dev
+php:
+  image: chrisqueen/dockermagento-php
+  links:
+    - "cache:rediscache"
+    - "sessions:redissession"
+    - "fullpagecache:redisfullpagecache"
+    - "solr:solr"
+    - "mysql:mysql"
+  ports:
+    - "9000:9000"
+  restart: on-failure
+  volumes_from:
+    - git-sync
+  sequential_deployment: true
+  tags:
+    - CQC_FB_Dev
+ mysql:
+  image: mysql:5.6
+  ports:
+    - "3306:3306"
+  environment:
+    MYSQL_ROOT_PASSWORD: pw
+  restart: on-failure
+  tags:
+    - CQC_FB_Dev
+solr:
+  image: solr
+  restart: on-failure
+  tags:
+    - CQC_FB_Dev
+cache:
+  image: redis:latest
+  restart: on-failure
+  tags:
+    - CQC_FB_Dev
+fullpagecache:
+  image: redis:latest
+  restart: on-failure
+  tags:
+    - CQC_FB_Dev
+sessions:
+  image: redis:latest
+  restart: on-failure
+  tags:
+    - CQC_FB_Dev
+adminphp:
+  image: phpmyadmin/phpmyadmin
+  ports:
+    - "8080:80"
+  links:
+    - "mysql:mysql"
+  environment:
+    PMA_HOST: "mysql"
+    PMA_PORT: 3306
+  sequential_deployment: true
+  restart: on-failure
+  tags:
+    - CQC_FB_Dev
+git-sync:
+  image: openweb/git-sync:0.0.1
+  environment:
+    GIT_SYNC_REPO: "https://github.com/bragento/magento-core.git"
+    GIT_SYNC_DEST: "/var/www/html/web"
+    GIT_SYNC_BRANCH: "1.9"
+    GIT_SYNC_REV: "FETCH_HEAD"
+    GIT_SYNC_WAIT: "10"
+    restart: on-failure
+    tags:
+      - CQC_FB_Dev
