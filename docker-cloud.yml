@@ -7,13 +7,13 @@ adminphp:
     - mysql
   ports:
     - '8080:80'
-  restart: on-failure
+  restart: always
   sequential_deployment: true
   tags:
     - CQC_FB_Dev
 cache:
   image: 'redis:latest'
-  restart: on-failure
+  restart: always
   tags:
     - CQC_FB_Dev
 cron:
@@ -29,7 +29,7 @@ cron:
     - 'fullpagecache:redisfullpagecache'
     - 'sessions:redissession'
     - solr
-  restart: on-failure
+  restart: always
   sequential_deployment: true
   tags:
     - CQC_FB_Dev
@@ -38,7 +38,7 @@ cron:
   working_dir: /var/www/html/web
 fullpagecache:
   image: 'redis:latest'
-  restart: on-failure
+  restart: always
   tags:
     - CQC_FB_Dev
 git-sync:
@@ -48,8 +48,8 @@ git-sync:
     - 'GIT_SYNC_REPO=https://github.com/bragento/magento-core.git'
     - GIT_SYNC_REV=FETCH_HEAD
     - GIT_SYNC_WAIT=10
-    - restart=on-failure
   image: 'openweb/git-sync:0.0.1'
+  restart: always
   tags:
     - CQC_FB_Dev
   volumes:
@@ -77,7 +77,7 @@ installer:
     - 'fullpagecache:redisfullpagecache'
     - 'sessions:redissession'
     - solr
-  restart: on-failure
+  restart: always
   sequential_deployment: true
   tags:
     - CQC_FB_Dev
@@ -89,11 +89,10 @@ mysql:
   image: 'mysql:5.6'
   ports:
     - '3306:3306'
-  restart: on-failure
+  restart: always
   tags:
     - CQC_FB_Dev
 nginx:
-  command: "nginx -g 'daemon off;'"
   environment:
     - MAGENTO_DEVELOPERMODE=1
     - MAGENTO_ROOT=/var/www/html/web
@@ -103,7 +102,7 @@ nginx:
   ports:
     - '80:80'
     - '443:443'
-  restart: on-failure
+  restart: always
   sequential_deployment: true
   tags:
     - CQC_FB_Dev
@@ -117,9 +116,7 @@ php:
     - 'fullpagecache:redisfullpagecache'
     - 'sessions:redissession'
     - solr
-  ports:
-    - '9000:9000'
-  restart: on-failure
+  restart: always
   sequential_deployment: true
   tags:
     - CQC_FB_Dev
@@ -127,11 +124,14 @@ php:
     - git-sync
 sessions:
   image: 'redis:latest'
-  restart: on-failure
+  restart: always
   tags:
     - CQC_FB_Dev
 solr:
+  entrypoint: docker-entrypoint.sh solr-precreate mycore
   image: 'solr:latest'
-  restart: on-failure
+  ports:
+    - '8983:8983'
+  restart: always
   tags:
     - CQC_FB_Dev
