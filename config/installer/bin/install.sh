@@ -128,7 +128,7 @@ magerun --skip-root-check --root-dir="$MAGENTO_ROOT" \
 chgrp -R 33 /var/www/html/web
 
 
-# Check if the MAGENTO_ROOT direcotry has been specified
+# Check if the MAGENTO_ROOT directory has been specified
 if [ -z "$MAGENTO_ROOT" ]
 then
 	echo "Please specify the root directory of Magento via the environment variable: MAGENTO_ROOT"
@@ -149,9 +149,6 @@ then
 
 	echo "Preparing the Magerun Configuration"
     substitute-env-vars.sh /etc /etc/n98-magerun.yaml.tmpl
-	
-	echo "Installing Sample Data: Database"
-    magerun --skip-root-check --root-dir="$MAGENTO_ROOT" db:create
 
 	echo "Updating Magento"
 	updateMagento
@@ -178,11 +175,10 @@ then
     magerun --skip-root-check --root-dir="$MAGENTO_ROOT" cache:disable layout
     magerun --skip-root-check --root-dir="$MAGENTO_ROOT" cache:disable block_html
 
-
-	  #echo "Setting up Admin User"
+	#echo "Setting up Admin User"
     #setupAdminUser
 
-    echo "Update fininished"
+    echo "Update finished"
 	printLogonInformation
 
 	runForever
@@ -235,7 +231,7 @@ magerun --skip-root-check --root-dir="$MAGENTO_ROOT" cache:disable block_html
 echo "Fixing filesystem permissions"
 fixFilesystemPermissions
 
-echo "Installation fininished"
+echo "Installation finished"
 printLogonInformation
 
 runForever

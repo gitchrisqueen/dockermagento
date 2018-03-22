@@ -83,12 +83,19 @@ installer:
     - CQC_FB_Dev
   volumes_from:
     - nginx
+  volumes:
+    - /usr/local/etc/php
+    - /etc
+    - /bin
 mysql:
   environment:
     - MYSQL_ROOT_PASSWORD=pw
+    - MYSQL_DATABASE=magento
   image: 'mysql:5.6'
   ports:
     - '3306:3306'
+  volumes:
+    - 's3://cqcdbbackups/smartsolutions/everpretty/everpretty_prod_22-03-2018-00_00_01.sql.gz':/docker-entrypoint-initdb.d/everpretty_prod_22-03-2018-00_00_01.sql.gz
   restart: always
   tags:
     - CQC_FB_Dev
@@ -96,6 +103,8 @@ nginx:
   environment:
     - MAGENTO_DEVELOPERMODE=1
     - MAGENTO_ROOT=/var/www/html/web
+    - PHP_PORT_9000_TCP_ADDR=php
+    - PHP_PORT_9000_TCP_PORT=9000
   image: 'chrisqueen/dockermagento-nginx:latest'
   links:
     - php
@@ -116,6 +125,8 @@ php:
     - 'fullpagecache:redisfullpagecache'
     - 'sessions:redissession'
     - solr
+  ports:
+    - '9000:9000'
   restart: always
   sequential_deployment: true
   tags:
