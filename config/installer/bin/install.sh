@@ -175,8 +175,8 @@ then
     magerun --skip-root-check --root-dir="$MAGENTO_ROOT" cache:disable layout
     magerun --skip-root-check --root-dir="$MAGENTO_ROOT" cache:disable block_html
 
-	#echo "Setting up Admin User"
-    #setupAdminUser
+	echo "Setting up Admin User"
+    setupAdminUser
 
     echo "Update finished"
 	printLogonInformation

@@ -146,6 +146,10 @@ fi
 if [ -e "$MAGENTO_ROOT/index.php" ]
 then
 	echo "Magento is already installed."
+
+	echo "Preparing the Magerun Configuration"
+    substitute-env-vars.sh /etc /etc/n98-magerun.yaml.tmpl
+
 	echo "Updating Magento"
 	updateMagento
 
@@ -172,13 +176,13 @@ then
     magerun --skip-root-check --root-dir="$MAGENTO_ROOT" cache:disable block_html
 
 
-	  #echo "Setting up Admin User"
-    #setupAdminUser
+	echo "Setting up Admin User"
+    setupAdminUser
 
     echo "Update fininished"
 	printLogonInformation
 
-	runForever
+	#runForever
 	exit 0
 fi
 

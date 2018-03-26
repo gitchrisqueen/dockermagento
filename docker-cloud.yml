@@ -3,8 +3,6 @@ adminphp:
     - PMA_HOST=mysql
     - PMA_PORT=3306
   image: 'phpmyadmin/phpmyadmin:latest'
-  links:
-    - mysql
   ports:
     - '8080:80'
   restart: always
@@ -23,7 +21,6 @@ cron:
   hostname: cron.dockerized-magento.local
   image: 'meanbee/magento:5.6-cli'
   links:
-    - mysql
     - php
     - 'cache:rediscache'
     - 'fullpagecache:redisfullpagecache'
@@ -43,12 +40,12 @@ fullpagecache:
     - CQC_FB_Dev
 git-sync:
   environment:
-    - GIT_SYNC_BRANCH=1.9
+    - GIT_SYNC_BRANCH=fpcmagento
     - GIT_SYNC_DEST=/var/www/html/web
-    - 'GIT_SYNC_REPO=https://github.com/bragento/magento-core.git'
+    - 'GIT_SYNC_REPO=git@bitbucket.org:chrisqueen/firstbook.git'
     - GIT_SYNC_REV=FETCH_HEAD
     - GIT_SYNC_WAIT=10
-  image: 'openweb/git-sync:0.0.1'
+  image: 'chrisqueen/gitsync-private:latest'
   restart: always
   tags:
     - CQC_FB_Dev
@@ -73,6 +70,8 @@ installer:
   image: 'chrisqueen/dockermagento-installer:latest'
   links:
     - mysql
+    - nginx
+    - php
     - 'cache:rediscache'
     - 'fullpagecache:redisfullpagecache'
     - 'sessions:redissession'
@@ -81,21 +80,19 @@ installer:
   sequential_deployment: true
   tags:
     - CQC_FB_Dev
-  volumes_from:
-    - nginx
   volumes:
     - /usr/local/etc/php
     - /etc
     - /bin
+  volumes_from:
+    - nginx
 mysql:
   environment:
-    - MYSQL_ROOT_PASSWORD=pw
     - MYSQL_DATABASE=magento
-  image: 'mysql:5.6'
+    - MYSQL_ROOT_PASSWORD=pw
+  image: 'chrisqueen/mysql-private:firstbook20180326'
   ports:
     - '3306:3306'
-  volumes:
-    - 's3://cqcdbbackups/smartsolutions/everpretty/everpretty_prod_22-03-2018-00_00_01.sql.gz':/docker-entrypoint-initdb.d/everpretty_prod_22-03-2018-00_00_01.sql.gz
   restart: always
   tags:
     - CQC_FB_Dev
@@ -120,7 +117,6 @@ nginx:
 php:
   image: 'chrisqueen/dockermagento-php:latest'
   links:
-    - mysql
     - 'cache:rediscache'
     - 'fullpagecache:redisfullpagecache'
     - 'sessions:redissession'

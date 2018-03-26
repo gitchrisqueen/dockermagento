@@ -9,4 +9,8 @@ services:
     ports:
       - "80:80"
       - "443:443"
-    command: "nginx -g 'daemon off;'"
+    environment:
+      MAGENTO_ROOT: /var/www/html/web
+      MAGENTO_DEVELOPERMODE: 1
+      PHP_PORT_9000_TCP_ADDR: 9000
+      PHP_PORT_9000_TCP_PORT: 9000

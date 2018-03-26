@@ -36,6 +36,11 @@ services:
     fip: auto
     size: s4
     hostname: dockermagento-nginx
+    environment:
+      MAGENTO_ROOT: /var/www/html/web
+      MAGENTO_DEVELOPERMODE: 1
+      PHP_PORT_9000_TCP_ADDR: 9000
+      PHP_PORT_9000_TCP_PORT: 9000
     ports:
       - "80:80"
       - "443:443"
@@ -44,7 +49,8 @@ services:
     depends_on:
       - "php"
     noauto_volume: true
-    #volumes:
+    volumes:
+      - appcode:/var/www/html/web
       #- appcodeinternal:/var/www/html/web
   cron:
     size: s4
@@ -53,7 +59,8 @@ services:
     working_dir: /var/www/html/web
     command: /run-cron.sh
     noauto_volume: true
-    #volumes:
+    volumes:
+      - appcode:/var/www/html/web
       #- appcodeinternal:/var/www/html/web
     environment:
       - ENABLE_SENDMAIL=true
@@ -77,7 +84,8 @@ services:
       - "mysql:mysql"
     noauto_volume: true
     volumes:
-      - appcodeinternal:/var/www/html/web
+      - appcode:/var/www/html/web
+      #- appcodeinternal:/var/www/html/web
   mysql:
    image: mysql:5.6
    size: s4
@@ -122,8 +130,9 @@ services:
       PMA_PORT: 3306
 volumes:
   appcode:
-    volumes:
-      - https://github.com/bragento/magento-core
-  appcodeinternal:
-    volumes:
-          - https://github.com/bragento/magento-core
+    external: true
+    #volumes:
+      #- https://github.com/bragento/magento-core
+  #appcodeinternal:
+    #volumes:
+      #- https://github.com/bragento/magento-core
