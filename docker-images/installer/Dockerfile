@@ -57,5 +57,3 @@ RUN curl -o n98-magerun.phar https://files.magerun.net/n98-magerun.phar && \
 
 # Install composer
 RUN curl -sS https://getcomposer.org/installer | php -- --filename=composer --install-dir=bin
-
-ENTRYPOINT ['bash','/bin/install.sh']
