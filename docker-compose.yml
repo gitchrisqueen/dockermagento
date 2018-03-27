@@ -1,7 +1,8 @@
 version: '2.0'
 services:
   installer:
-    image: chrisqueen/dockermagento-installer
+    image: chrisqueen/dockermagento-installer:latest
+    build: ./docker-images/installer
     environment:
       DOMAIN: dockerized-magento.local
       MAGENTO_ROOT: /var/www/html/web
@@ -18,13 +19,13 @@ services:
       ENCRYPTIONKEY: 731aea833710535779fe8c7c49bc6c4d
     volumes_from:
       - nginx
-    volumes:
-      - ./config/installer/php/php.ini:/usr/local/etc/php/php.ini
-      - ./config/installer/magerun/n98-magerun.yaml.tmpl:/etc/n98-magerun.yaml.tmpl
-      - ./config/installer/magento/local.xml.tmpl:/etc/local.xml.tmpl
-      - ./config/installer/magento/fpc.xml.tmpl:/etc/fpc.xml.tmpl
-      - ./config/installer/bin/substitute-env-vars.sh:/bin/substitute-env-vars.sh
-      - ./config/installer/bin/install.sh:/bin/install.sh
+#    volumes:
+#      - ./config/installer/php/php.ini:/usr/local/etc/php/php.ini
+#      - ./config/installer/magerun/n98-magerun.yaml.tmpl:/etc/n98-magerun.yaml.tmpl
+#      - ./config/installer/magento/local.xml.tmpl:/etc/local.xml.tmpl
+#      - ./config/installer/magento/fpc.xml.tmpl:/etc/fpc.xml.tmpl
+#      - ./config/installer/bin/substitute-env-vars.sh:/bin/substitute-env-vars.sh
+#      - ./config/installer/bin/install.sh:/bin/install.sh
     links:
       - "cache:rediscache"
       - "sessions:redissession"
@@ -34,8 +35,8 @@ services:
       #- "selenium:selenium"
     #extra_hosts:
       #- "mysql:77.104.144.190"
-    depends_on:
-      - "php"
+#    depends_on:
+#      - "php"
     entrypoint: /bin/install.sh
   nginx:
     image: chrisqueen/dockermagento-nginx
@@ -57,7 +58,6 @@ services:
       - ./config/nginx/custom-locations:/etc/nginx/custom-locations
     volumes_from:
       - php
-
   cron:
     image: meanbee/magento:5.6-cli
     hostname: cron.dockerized-magento.local
@@ -75,7 +75,7 @@ services:
       - "sessions:redissession"
       - "fullpagecache:redisfullpagecache"
       - "solr:solr"
-	  - "mysql:mysql"
+      - "mysql:mysql"
     #extra_hosts:
       #- "mysql:11.101.101.111"
   php:
@@ -95,17 +95,17 @@ services:
       - ./web:/var/www/html/web
       - ./media:/var/www/html/web/media
   mysql:
-   image: mysql:5.6
-   ports:
-     - "3306:3306"
-   environment:
-     MYSQL_ROOT_PASSWORD: pw
-   volumes:
-     - ./data/mysql:/var/lib/mysql
-     - ./config/mysql:/etc/mysql/conf.d
-     - ./data/sql_dumps/:/sql_dumps
+    image: mysql:5.6
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: pw
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+      - ./config/mysql:/etc/mysql/conf.d
+      - ./data/sql_dumps/:/sql_dumps
   solr:
-    image: chrisqueen/dockermagento-solr
+    image: solr
   cache:
     image: redis:latest
   fullpagecache:

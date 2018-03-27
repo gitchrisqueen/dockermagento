@@ -37,18 +37,25 @@ RUN apt-get update && \
     telnet \
     netcat \
     git-core \
-    zip && \
+    zip \
+    wget && \
     apt-get purge -y --auto-remove
 
+ENV DOCKERIZE_VERSION v0.6.1
+RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+    && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+
 # Install magerun
-RUN curl -o magerun https://raw.githubusercontent.com/netz98/n98-magerun/master/n98-magerun.phar && \
-    chmod +x ./magerun && \
-    ./magerun selfupdate && \
-    cp ./magerun /usr/local/bin/ && \
-    rm ./magerun && \
+RUN curl -o n98-magerun.phar https://files.magerun.net/n98-magerun.phar && \
+    chmod +x ./n98-magerun.phar && \
+    ./n98-magerun.phar selfupdate && \
+    mv ./n98-magerun.phar /usr/local/bin/magerun && \
     apt-get update && \
     apt-get install -qy mysql-client && \
     apt-get purge -y --auto-remove
 
 # Install composer
 RUN curl -sS https://getcomposer.org/installer | php -- --filename=composer --install-dir=bin
+
+CMD dockerize -wait tcp://mysql:3306 -wait tcp://nginx:80 /bin/install.sh

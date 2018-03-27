@@ -6,12 +6,14 @@ adminphp:
   ports:
     - '8080:80'
   restart: always
+  autoredeploy: true
   sequential_deployment: true
   tags:
     - CQC_FB_Dev
 cache:
   image: 'redis:latest'
   restart: always
+  autoredeploy: true
   tags:
     - CQC_FB_Dev
 cron:
@@ -27,6 +29,7 @@ cron:
     - 'sessions:redissession'
     - solr
   restart: always
+  autoredeploy: true
   sequential_deployment: true
   tags:
     - CQC_FB_Dev
@@ -36,6 +39,7 @@ cron:
 fullpagecache:
   image: 'redis:latest'
   restart: always
+  autoredeploy: true
   tags:
     - CQC_FB_Dev
 git-sync:
@@ -47,12 +51,13 @@ git-sync:
     - GIT_SYNC_WAIT=10
   image: 'chrisqueen/gitsync-private:latest'
   restart: always
+  autoredeploy: true
   tags:
     - CQC_FB_Dev
   volumes:
     - /var/www/html/web
 installer:
-  entrypoint: /bin/install.sh
+  #entrypoint: /bin/install.sh
   environment:
     - ADMIN_EMAIL=admin@demo.com
     - ADMIN_FIRSTNAME=Admin
@@ -76,7 +81,8 @@ installer:
     - 'fullpagecache:redisfullpagecache'
     - 'sessions:redissession'
     - solr
-  restart: always
+  restart: on-failure
+  autodestroy: on-success
   sequential_deployment: true
   tags:
     - CQC_FB_Dev
@@ -109,6 +115,7 @@ nginx:
     - '80:80'
     - '443:443'
   restart: always
+  autoredeploy: true
   sequential_deployment: true
   tags:
     - CQC_FB_Dev
@@ -132,6 +139,7 @@ php:
 sessions:
   image: 'redis:latest'
   restart: always
+  autoredeploy: true
   tags:
     - CQC_FB_Dev
 solr:
@@ -140,5 +148,6 @@ solr:
   ports:
     - '8983:8983'
   restart: always
+  autoredeploy: true
   tags:
     - CQC_FB_Dev
