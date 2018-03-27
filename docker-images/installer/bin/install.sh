@@ -2,6 +2,9 @@
 
 set -e
 
+# Wait for mysql and nginx to start first
+dockerize -wait tcp://mysql:3306 -wait tcp://nginx:80 echo "Mysql and NXING are REady"
+
 #####################################
 # Update the Magento Installation
 # Arguments:
