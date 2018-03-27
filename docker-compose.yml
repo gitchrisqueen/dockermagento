@@ -1,7 +1,7 @@
 version: '2.0'
 services:
   installer:
-    image: chrisqueen/dockermagento-installer:latest
+    image: chrisqueen/dockermagento-installer:dev
     build: ./docker-images/installer
     environment:
       DOMAIN: dockerized-magento.local
