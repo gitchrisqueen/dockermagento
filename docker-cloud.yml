@@ -82,7 +82,6 @@ installer:
     - 'sessions:redissession'
     - solr
   restart: on-failure
-  autodestroy: on-success
   sequential_deployment: true
   tags:
     - CQC_FB_Dev

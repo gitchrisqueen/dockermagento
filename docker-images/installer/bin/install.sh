@@ -3,8 +3,7 @@
 set -e
 
 # Wait for mysql and nginx to start first
-dockerize -wait tcp://mysql:3306 -wait tcp://nginx:80 -timeout 1800s
-echo "Mysql and NXING are Ready"
+dockerize -wait tcp://mysql:3306 -wait tcp://nginx:80 -timeout 1800s echo "Mysql and NXING are Ready"
 
 #####################################
 # Update the Magento Installation
@@ -127,6 +126,8 @@ magerun --skip-root-check --root-dir="$MAGENTO_ROOT" \
 		"${ADMIN_LASTNAME}" \
 		"Administrators"
 }
+
+
 # Fix the www-folder permissions
 #chgrp -R 33 /var/www/html
 chgrp -R 33 /var/www/html/web
